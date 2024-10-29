@@ -1,0 +1,32 @@
+---
+title: Model Checking
+---
+
+# Overview
+
+The process of model checking for a Bayesian analysis involves two steps: seeing if the estimation of the posterior was good, then seeing if the model fit is actually useful. The assumptions of a Bayesian analysis are slightly more relaxed compared to traditional frequentist analyses but it requires a bit more thought when constructing and evaluating the model. You should be able to justify your subjective decisions in model building.
+
+## Convergence diagonsitics
+
+The first thing to consider when fitting a Bayesian model is if your MC Chains are well mixed, or converged. This means that you are doing a good job estimating the posterior as the chains have explored, and largely landed, in simimlar regions of high density for values of the posterior. There are several diagnostic tools to check for model convergence, many of which are automatically generated in output from stan or easily accessible using functions in r (check out `bayesplot`).
+
+Some things which are worth considering:
+
+-   Rhat: this is a metric evaluating how well the chains converged. It should be near 1 (stan says acceptable around \<1.1) but this can be context dependent.
+
+-   ESS: Effective sample size is a metric which measures how many samples can be considered independent from your chains. While I didn't go into detail, since MCMC estimation of the posterior relies on sequentially adding proposal values for $\theta$, those values are inherently autocorrelated so ESS calculates a value for how many can be considered independent while accounting for an autocorrelation factor (Kruschke equation 7.11).
+
+-   Traceplots: you can visualize the MCMC chains using things like `bayesplot::mcmc_trace(fit)` to see if the chains are well mixed. This also is a good oppoturnity to see if there was the propper amount of burn-in.
+
+## Evaluating model fit
+
+Once your confirmed if the chains are well mixed, you can see if the posterior distribution and overall model structure are actually useful for your data. This can be done a number of ways:
+
+-   PPC: Posterior Predictive Checks involve using the model to simulate what is expected with the estimation of the posterior distribution. Comparing these estimates allows us to see how well the predictions match the observed data. This is fundamentaly just like checking residuals and you can even do all the residual plots which you might be familiar with. This is easily done using the `bayesplot` package in r with `pp_check()`
+-   You can check residuals using common residual tests or things like calculating RMSE.
+-   Bayes P-value: A bayes p-value checks if your predicted data match the observed data using some discrepancy metric
+-   Cross-validation: This is an approach more common in ML applications but works really well here. Esspecially applicable if you are interseted in using your posterior distributions for prediction or forecasting. These procedures involve selectively leaving out some of your data, then evaluating the model's ability to predict that data (leave-one-out or k-fold are common approaches).
+
+# Further Information:
+
+A good guide for checking your models can be detailed in [Conn et al. 2018's A guide to Bayesian model checking for ecologists](https://www.perrywilliams.us/wp-content/uploads/2023/05/conn2018guide.pdf)

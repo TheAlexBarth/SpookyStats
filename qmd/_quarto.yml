@@ -1,0 +1,37 @@
+project:
+  type: website
+
+website:
+  title: "Spooky Stats"
+  sidebar:
+    style: 'docked'
+    search: false
+    contents:
+      - href: index.qmd
+        text: Home
+      - section: Basics
+        contents:
+        - href: 01_quick_bayes_introduction.qmd
+        - href: 02_mcmc_tech.qmd
+        - href: 03_Model-Checking.qmd
+      - section: Spooky Stuff!
+        contents:
+        - href: ex01_single-parameter.qmd
+        - href: ex02_regression.qmd
+        - href: ex04_hierarchical-models.qmd
+        - href: ex05_count-data-models.qmd
+        - href: ex06_mapping-.qmd
+        - href: ex07_latent-processes.qmd
+      - section: Other stuff
+        contents:
+        - href: s01_additional_resources.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    toc-location: right
+
+
+

@@ -1,0 +1,27 @@
+---
+title: "Spooky Stats: A brief introduction to Bayesian modelling in R"
+---
+ 
+# What this is:
+
+I put together this page as a set of examples of why Bayesian inference can be useful or exciting. I'm assuming users have some familiarity with statistics or probability, likely from at least one undergrad level course. I'm also assuming you have some familiarity with working in R as that is what I use for all these examples.
+
+These examples should offer a starting point or motivation for constructing your own analyses. I constucted these examples from an ecology/marine science mindset. However, because I wrote these examples to share on Halloween, they are extra spooky. So, these examples are hopefully thought-provoking for both ecologists, marine scienstists and paranormal researchers or cryptozoologists.
+
+### Replicating these examples:
+
+This website is hosted from a github repo. You can copy and paste code from each article to construct your own analyses. However, you can also access all the scripts - not in a notebook format - directly from the [github repo](#). If you clone the repo, you can run the examples from each script and it will nicely integrate with all the data I pull in some of the more complicated examples. 
+
+# What this is not:
+
+This is not a comprehensive introcution, or even close to it. I constructed this to be a short introduction as a motivation or starting point for your own investigation. While the code in these examples may be a useful reference, it does not contain all the information you will need to conduct, and importantly - check, your own analyses. I largely don't cover the concepts behind MCMC, probability distributions, or the underlying mechanics for Bayesian inference. You definitely should explore more as there are resources better than I could write which can guide you.\
+
+Also, while in the provided examples, I do share some methods for reporting results of Bayesian analyses, it is far from a comprehensive guide of what should be shared.
+
+Take a look at the [additional resources](./s01_additional_resources.qmd)
+
+Also, this is not an argument for the existence of ghosts, werewolves, or zombies - just attempts to update our beliefs on their probabilities.
+
+
+# Slides:
+Here are the slides from my first presentation of these examples.
