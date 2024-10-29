@@ -58,3 +58,32 @@ saveRDS(were_fit, './data/ex01_werewolf-weight.rds')
 posterior_wolfs <- extract(were_fit)
 posterior_param_plot(posterior_wolfs$mu, dnorm, seq(100, 190, length.out = 10000), mu, mean = 150, sd = 30)
 posterior_param_plot(posterior_wolfs$sigma, dnorm, seq(5, 40, length.out = 10000), sigma, mean = 30, sd = 10)
+
+
+####
+# Comparing two groups #####
+####
+
+# \- simulate the data -----------------------------
+
+# yetis are log-normal distributed
+
+yeti_lmean = log(90)
+yeti_lsd = log(2)
+yeti_ss = 25
+yeti_obs = rlnorm(yeti_ss, yeti_lmean, yeti_lsd)
+
+bigf_mean = 260
+bigf_sd = 20
+bigf_ss = 50
+bigf_obs = rnorm(bigf_ss, bigf_mean, bigf_sd)
+
+
+ggplot() +
+  geom_histogram(aes(x = yeti_obs, fill = 'yeti'), alpha = 0.5) +
+  geom_histogram(aes(x = bigf_obs, fill = 'bigfoot'), alpha = 0.5) +
+  labs(x = 'kg', y = "Number of indv.", fill = "") +
+  theme_minimal()
+
+# \- Prepare data for stan ------------------
+
