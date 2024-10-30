@@ -1,0 +1,20 @@
+---
+title: Regression
+---
+
+# Zombie Speed - Linear Regression
+
+## Single Case
+
+
+## Hierarchical Case
+
+
+
+# Is there a ghost? - Logisitic Regression
+
+## Single Case
+
+
+## What if we missed them? - Occupancy Models
+

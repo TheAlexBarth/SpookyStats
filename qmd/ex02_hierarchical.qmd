@@ -1,0 +1,24 @@
+---
+title: Adding Levels
+---
+
+Hierarchical models are really where we start to unlock the power of bayesian analyses. The crux of a hierarchical model is to identify some population can be either made up of multiple sub-populations or maybe part of multiple larger groups. A hierarchical model allows us to identify variation across these different groups
+
+
+# Long horned longhorns:
+
+I'm diverging from the spooky examples now going to look at longhorns around different ranches. We are interested in the length of steers' horns - maybe Bevo wants to make sure he has no competition!
+
+It's all the same species, but we can imagine three different ranches which hold longhorn cattle. Let's say longhorns have an average horn length of 30cm with a standard deviation of 4cm. But we have three ranches. The ranches may all have a different mean value for their cattle, which is some variation of the group mean.
+
+
+
+
+# Different groups of a population
+
+I'm going to diverge from the spooky cases real quick to a longhorn example. How big are those horns? I googled for a while to try and find some real data and the best I could find was some averages from a study in 1964.
+
+Here's that data:
+
+
+We can see that there are three types of bulls - bulls, cows, and steers. All of which have there own distribution but contribute to the overall distribution. We can model this out to look at the group means across types of longhorn and different ranches:
