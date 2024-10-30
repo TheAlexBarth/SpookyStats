@@ -4,21 +4,34 @@ title: Adding Levels
 
 Hierarchical models are really where we start to unlock the power of bayesian analyses. The crux of a hierarchical model is to identify some population can be either made up of multiple sub-populations or maybe part of multiple larger groups. A hierarchical model allows us to identify variation across these different groups
 
-
 # Long horned longhorns:
 
 I'm diverging from the spooky examples now going to look at longhorns around different ranches. We are interested in the length of steers' horns - maybe Bevo wants to make sure he has no competition!
 
 It's all the same species, but we can imagine three different ranches which hold longhorn cattle. Let's say longhorns have an average horn length of 30cm with a standard deviation of 4cm. But we have three ranches. The ranches may all have a different mean value for their cattle, which is some variation of the group mean.
 
+### Take it higher
 
+In this example I just set a group-level variation where individual ranches have some variation of a global mean. But you can easily imagine a case where there are different types of cattle. For example let's say we have a whole population of longhorns with cows, bulls, and steers. They likely all have some effect on the mean horn length depending on their type.
 
+We can update our model to include this.
 
-# Different groups of a population
+$$
+\begin{align}
+y_{ij} &\sim \mathcal{N}(\mu_{j}, \sigma)\\
+\\
+\mu_{j} &\sim \mathcal{N}(\phi, \epsilon)\\
+\phi &= \beta_0 + \Sigma_{g=1}^3{\beta_gg_i} \\
+\\
+\sigma &\sim [\sigma]\\
+\epsilon &\sim [\epsilon]\\
+\beta_0 &\sim [\beta_0]\\
+\beta_{g_c} &\sim [\beta_{g_c}]\\
+\beta_{g_b} &\sim [\beta_{g_b}]\\
+\beta_{g_s} &\sim [\beta_{g_s}]\\
+\end{align}
+$$
 
-I'm going to diverge from the spooky cases real quick to a longhorn example. How big are those horns? I googled for a while to try and find some real data and the best I could find was some averages from a study in 1964.
+In this case we have a global mean for all longhorns, but it falls up to be the intercept of our model for $\phi$, which is then impacted by an effect of longhorn-type $\beta_g$ where $g$ is either cow, bull, or steer. Each effect of $\beta_g$ has it's own prior distribution. I added ranch-level variation as $\epsilon$. Although it could have been more explicitly incorporated. Also, I said there was individual variation $\sigma$ which is equal across all ranches and groups, but maybe this isn't the case, you could then include some hierarchical structure for individual variation!
 
-Here's that data:
-
-
-We can see that there are three types of bulls - bulls, cows, and steers. All of which have there own distribution but contribute to the overall distribution. We can model this out to look at the group means across types of longhorn and different ranches:
+You can see how this quickly can spiral into a larger structure!
