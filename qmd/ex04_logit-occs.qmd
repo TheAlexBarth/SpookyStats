@@ -1,0 +1,432 @@
+---
+title: Do you believe in ghosts?
+---
+
+Ok lets try to imagine Port A is now facing a ghost epidemic - what's the probability that your in a haunted house? Well we can use house hauntings as a binary outcome and model them as a function of some predictor. Likely, the most important thing influencing ghosts is the number of murders which have occurred in that house - so let's use that as our predictor.
+
+# Predicting Ghost Probability
+
+:::{.panel-tabset}
+
+### Simulating Ghosts
+
+Well this is probably an overesimate, but I'm simulating murders per house from a poisson distribution with a mean rate of 2/house. Let's say it's not Port A, but a particularly spooky town.
+
+```{r}
+set.seed(1031)
+library(ggplot2) |> suppressMessages()
+library(bayesplot) |> suppressMessages()
+library(rstan) |> suppressMessages()
+library(ggpubr) |> suppressMessages()
+
+rm(list = ls())
+source('../R/utils.R') |> suppressMessages() #note path
+
+
+###
+# Simulating Ghost probabilities ######
+###
+
+n_houses <- 200 #number of houses to haunt
+n_murders <- rpois(n_houses, 2) # mean 2 murders per house
+
+beta_0 <- -5
+beta_1 <- 2
+
+p_ghost <- 1 / (1 + exp(-(beta_0 + beta_1 * n_murders)))
+
+# Simulate presence/absence data
+haunted <- rbinom(n_houses, size = 1, prob = p_ghost)
+
+ggplot() +
+  geom_point(aes(x = n_murders, y = haunted)) +
+  theme_minimal()
+
+```
+
+The above plot shows us the number of murders per house predicting if a house is haunted (1) or not (0).
+
+### Model
+
+The event of a house being haunted is a binary outcome $y_i$. The probability it is haunted can be defined as $\psi$. We then can use a logistic regression to predict the probability for each house, where $m_i$ is the number of murders in house $i$
+
+$$
+
+\begin{align}
+
+y_i &\sim bern(\psi_i)\\
+
+logit(\psi_i) &= \beta_0 + \beta_1 * m_i\\
+\\
+\beta_0 &\sim \mathcal{N}(0, 5)\\
+\beta_1 &\sim \mathcal{N}(0,2)
+
+\end{align}
+
+$$
+
+
+### Stan
+```{text, eval = F}
+data {
+  int<lower=0> N;
+  array[N] int<lower=0, upper=1> y;
+  vector[N] x;
+}
+
+parameters {
+  real beta_0;
+  real beta_1;
+}
+
+model {
+  // Priors
+  beta_0 ~ normal(0, 5);
+  beta_1 ~ normal(0, 2);
+  
+  // Likelihood
+  y ~ bernoulli_logit(beta_0 + beta_1 * x);
+}
+```
+
+### Analysis
+
+```{r, eval = F}
+ \- Prep for Stan -----------
+
+ghost_data <- list(
+  N = n_houses,
+  y = haunted,
+  x = n_murders
+)
+
+ghost_fit <- stan(
+  './stan/ex04_simple-ghosts.stan',
+  'gfit',
+  data = ghost_data,
+  iter = 5000, warmup = 1000, cores =10
+)
+ghost_fit
+```
+
+```{r, echo = F}
+ghost_fit = readRDS('../data/ex04_simple-ghost.rds')
+ghost_fit
+```
+
+Now we can predict the probability a house is haunted based and compare it to our observed data:
+
+```{r}
+ghost_post <- extract(ghost_fit)
+
+# \- Plot results ------------------
+pred_range <- seq(min(n_murders), max(n_murders), length.out = 1000)
+
+
+prob_matrix <- matrix(NA, nrow = length(ghost_post$beta_0), ncol = length(pred_range))
+for(i in 1:length(pred_range)) {
+  prob_matrix[,i] <- plogis(
+    ghost_post$beta_0 + ghost_post$beta_1 * pred_range[i]
+  )
+}
+
+pred_rel <- data.frame(
+  mean = apply(prob_matrix, 2, mean),
+  low = apply(prob_matrix, 2, function(x) HDInterval::hdi(x)[1]),
+  high = apply(prob_matrix, 2, function(x) HDInterval::hdi(x)[2])
+)
+
+
+ggplot() +
+  geom_point(aes(x = n_murders, y = haunted)) +
+  geom_line(
+    aes(x = pred_range, y = pred_rel$mean)
+  )+
+  geom_ribbon(
+    aes(
+      x = pred_range,
+      ymin = pred_rel$low,
+      ymax = pred_rel$high
+    ),
+    fill = 'lightblue',
+    alpha = 0.75
+  )+
+  labs(x = "Number of Murders", y = "Pr(Ghost)")+
+  theme_minimal()
+
+```
+
+:::
+
+
+# What if you just can't feeeel them!
+
+The previous example, once again is pretty unrealistic. Just because a ghost is there, you probably wouldn't see them. Ghosts by definition are pretty ellusive.
+
+So there's 200 houses - and let's say that they are all worried there's a ghost in them. So they hire mediums to come a check it out. However, mediums may also struggle to identify a house - some houses are more clairvoyant (I googled this term) which means they are easier to connect to the spirit world in this setting. The paranomal researchers might take issue with the belief that people are clairvoyant not houses, but I'm setting the clairvoyance at the location. It's all made up anyways.
+
+So even if a ghost is there, it may not be detected. Now some houses were able to afford multiple medium visits to try and contact a ghost but not all. Let's model this whole system.
+
+:::{.panel-tabset}
+
+### Data Simulation
+
+I've created a clvoy variable to be clairvoyance, which is pretty variable across houses. Then I calculate the true occupancy probability based on number of murders, we randomly simulate the number of visits per house. Each house has a probability of seeing a ghost, which is a function of its clairvoyance.
+
+```{r}
+
+#clairvoyance of house
+clvoy <- rnorm(n_houses, mean = 10, sd = 4)
+
+
+occupancy_prob <- plogis(beta_0 + beta_1 * n_murders) 
+
+# Simulate occupancy states for each site
+occupancy <- rbinom(n_houses, size = 1, prob = occupancy_prob)
+
+
+alpha_0 = -5
+alpha_1 = 0.3
+
+detection_prob <- plogis(alpha_0 + alpha_1 * clvoy)
+
+n_visits <- sample(1:3, n_houses, replace = T)
+
+detected <- matrix(NA, n_houses, 3)
+
+for (i in 1:n_houses) {
+  for (j in 1:n_visits[i]) {
+    if (occupancy[i] == 1) {
+      detected[i, j] <- rbinom(1, size = 1, prob = detection_prob[i])
+    } else {
+      detected[i, j] <- 0
+    }
+  }
+}
+
+ggplot() +
+  geom_point(
+    aes(x = n_murders,
+    y = apply(detected, 1, function(x) min(1, sum(x,na.rm = T)))
+    )
+  )+
+  labs(x = 'Murders', y = 'Ghost Sightings') +
+  theme_minimal()
+```
+
+Looking just at the raw data, we can tell it would be hard to extract a true relationship betweeen our variables. But we can model the two processes to tease apart this relationship
+
+### Model
+
+For fun, I set a really stronger prior indicating a lack of belief in ghosts in the $\beta_0$ prior.
+
+$$
+\begin{align}
+y_{i} &= \Sigma_j y_{ij}\\ &\sim \ \left\{ 
+  \begin{array}{l}
+    0, \ z_i = 0\\
+    bin(J_i, p_i), \ z_i =1\\
+  \end{array} \right. \\
+z_i &\sim bern(\psi_i)\\
+\\
+logit(p_i) &\sim \alpha_0 + \alpha_1 * c_i\\
+logit(\psi_i) &\sim \beta_0 + \beta_1 * m_i
+\\
+\beta_0 &\sim \mathcal{N}(-10, 2)\\
+\beta_1 &\sim \mathcal{N}(0, 2)\\
+\alpha_0 &\sim \mathcal{N}(0, 10)\\
+\alpha_1 &\sim \mathcal{N}(0, 2)\\
+
+\end{align}
+$$
+
+### Stan
+
+```{text, eval = F}
+data {
+    int<lower=0> N; //houses
+    array[N] int<lower=0> v; // visits
+    array[N] int<lower=0> detections;
+    vector[N] x;
+    vector[N] c;
+}
+
+parameters {
+    real beta_0;
+    real beta_1;
+    real alpha_0;
+    real alpha_1;
+}
+
+transformed parameters {
+    array[N] real p;
+    array[N] real psi;
+
+    for(i in 1:N) {
+        p[i] = inv_logit(alpha_0 + alpha_1 * c[i]);
+        psi[i] = inv_logit(beta_0 + beta_1 * x[i]);
+    }
+}
+
+model {
+    // Priors
+    beta_0 ~ normal(-10, 3);
+    beta_1 ~ normal(0, 2);
+    alpha_0 ~ normal(0, 10);
+    alpha_1 ~ normal(0, 2);
+
+
+    for (i in 1:N) {
+        detections[i] ~ binomial(v[i], p[i] * psi[i]);
+    }
+}
+```
+
+### Analysis
+
+One thing worth noting here, I still don't scale my data. If you are fitting multiple predictors, with different scales, scaling is a good idea. However, since the predictors are for different sub-models it is ok.
+
+```{r, eval = F}
+
+detection_data <- list(
+  N = n_houses,
+  v = n_visits,
+  occupancy = occupancy,
+  detections = apply(detected, 1, sum, na.rm = T),
+  x = n_murders,
+  c = clvoy
+)
+
+detection_fit <- stan(
+  './stan/ex04_occupancy-ghosts.stan',
+  'occ-mod',
+  data = detection_data,
+  iter = 4000, warmup = 1000, cores = 10,
+  thin = 10 # it was slow since it estimates every individual p/psi
+)
+detection_fit
+```
+
+```{r, echo = F}
+detection_fit = readRDS('../data/ex04_occupancy-ghosts.rds')
+summary(detection_fit)$summary |> head(4)
+```
+
+Great! now we can plot our esimated posterior relationship of murders to ghosts, having accounted for detection probability
+
+```{r}
+
+detect_post <- extract(
+  detection_fit,
+  pars = c('beta_0', 'beta_1', 'alpha_0', 'alpha_1')
+)
+
+
+# \- Plot results ------------------
+pred_range <- seq(min(n_murders), max(n_murders), length.out = 1000)
+
+
+occ_matrix <- matrix(NA, nrow = length(detect_post$beta_0), ncol = length(pred_range))
+for(i in 1:length(pred_range)) {
+  occ_matrix[,i] <- plogis(
+    detect_post$beta_0 + detect_post$beta_1 * pred_range[i]
+  )
+}
+
+occ_rel <- data.frame(
+  mean = apply(occ_matrix, 2, mean),
+  low = apply(occ_matrix, 2, function(x) HDInterval::hdi(x)[1]),
+  high = apply(occ_matrix, 2, function(x) HDInterval::hdi(x)[2])
+)
+
+
+ggplot() +
+  geom_point(
+    aes(
+      x = n_murders,
+      y = haunted
+    ),
+    position = position_jitter(0,0.03),
+    alpha = 0.3,
+    color = 'red'
+  )+
+  geom_point(
+    aes(
+      x = n_murders,
+      y = apply(detected, 1, function(x) min(1, sum(x,na.rm = T)))
+    ),
+    position = position_jitter(0,0.01),
+    alpha = 0.3
+  ) +
+  geom_line(
+    aes(x = pred_range, y = occ_rel$mean)
+  )+
+  geom_ribbon(
+    aes(
+      x = pred_range,
+      ymin = occ_rel$low,
+      ymax = occ_rel$high
+    ),
+    fill = 'lightblue',
+    alpha = 0.75
+  )+
+    labs(x = 'Murders', y = 'Pr(Ghost)') +
+  theme_minimal()
+
+```
+
+In the above figure, I overlayed real ghosts as red points and the observations at black points. We can see our model does a good job capturing the true relationship here!
+
+We also can look at the effect of clairvoyance on ghost detection.
+
+```{r}
+# \- Also look at the influence of clvoy --------
+
+crange <- seq(min(clvoy), max(clvoy), length.out = 1000)
+
+
+detect_mat <- matrix(NA, nrow = length(detect_post$alpha_0), ncol = length(crange))
+for(i in 1:length(crange)) {
+  detect_mat[,i] <- plogis(
+    detect_post$alpha_0 + detect_post$alpha_1 * crange[i]
+  )
+}
+
+det_rel <- data.frame(
+  mean = apply(detect_mat, 2, mean),
+  low = apply(detect_mat, 2, function(x) HDInterval::hdi(x)[1]),
+  high = apply(detect_mat, 2, function(x) HDInterval::hdi(x)[2])
+)
+
+
+ggplot() +
+  geom_point(
+    aes(
+      x = clvoy,
+      y = apply(detected, 1, function(x) min(1, sum(x,na.rm = T)))
+    ),
+    position = position_jitter(0,0.01),
+    alpha = 0.3
+  ) +
+  geom_line(
+    aes(x = crange, y = det_rel$mean)
+  )+
+  geom_ribbon(
+    aes(
+      x = crange,
+      ymin = det_rel$low,
+      ymax = det_rel$high
+    ),
+    fill = 'lightblue',
+    alpha = 0.75
+  )+
+    labs(x = "Clairvoyance", y = 'Pr(Detection)')+
+  theme_minimal()
+
+```
+
+### Further Thoughts
+
+This was a pretty basic case of an occupancy model, but it shows how we can use Bayesian inference to model different aspects of a system AND fill in data for points where we may have less observations. This can be expanded to have spatial compontent for unobserved areas or even include false positives (great for eDNA!)
+
+:::

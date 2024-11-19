@@ -10,7 +10,7 @@ parameters {
 
 model {
     sigma ~ normal(30, 10);
-    mu ~ normal(150, sigma);
+    mu ~ normal(150, 40);
     
     y ~ normal(mu, sigma);
 }

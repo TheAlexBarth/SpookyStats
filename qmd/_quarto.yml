@@ -17,18 +17,18 @@ website:
       - section: Spooky Stuff!
         contents:
         - href: ex01_single-parameter.qmd
-        - href: ex02_regression.qmd
-        - href: ex04_hierarchical-models.qmd
-        - href: ex05_count-data-models.qmd
-        - href: ex06_mapping-.qmd
-        - href: ex07_latent-processes.qmd
+        - href: ex02_hierarchical.qmd
+        - href: ex03_linear-models.qmd
+        - href: ex04_logit-occs.qmd
+        # - href: ex05_process-models.qmd
+        # - href: ex06_count_data.qmd
       - section: Other stuff
         contents:
         - href: s01_additional_resources.qmd
 
 format:
   html:
-    theme: cosmo
+    theme: darkly
     css: styles.css
     toc: true
     toc-location: right

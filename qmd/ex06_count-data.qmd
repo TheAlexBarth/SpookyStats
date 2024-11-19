@@ -1,0 +1,14 @@
+
+Let's count how many bigfoot observations there are across the country. 
+For this we can turn to a great source of citizen science data - [The Bigfoot Field Organization's Geographic Database of Bigfoot / Sasquatch Sightings & Reports](https://www.bfro.net/gdb/)
+
+# Exploratory Data Analysis
+
+
+# Poisson Regression
+
+
+# Zero-Inflated
+
+
+# Modelling Bigfoot Distribution

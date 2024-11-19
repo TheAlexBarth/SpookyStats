@@ -2,4 +2,89 @@
 title: Processing it all
 ---
 
-# Vampires 
+# Coming Soon
+
+```{r}
+set.seed(1031)
+rm(list = ls())
+
+# Load necessary libraries
+library(deSolve)
+library(ggplot2)
+library(rstan)
+
+# Define the Lotka-Volterra model
+ghosts_dyanos <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+
+    dGhosts <- g_arrival * ghosts - g_removal * ghosts * busters
+    dBusters <- b_arrival * ghosts * busters - b_exit * busters
+    
+    list(c(dGhosts, dBusters))
+  })
+}
+
+# Parameters
+parameters <- c(g_arrival = 0.1,
+                g_removal = 0.002,
+                b_arrival = 0.002,
+                b_exit = 0.1)
+
+# Initial state
+state <- c(ghosts = 40, busters = 9)
+
+# Time sequence
+times <- seq(0, 100, by = 1)
+
+# Run the simulation using ode_rk45
+out <- ode(y = state, times = times, func = ghosts_dyanos, parms = parameters, method = "rk4")
+
+# Convert output to a data frame
+out_df <- as.data.frame(out)
+
+
+
+# \- Simulate observations ------------------------
+b_times <- seq(1,max(times),2)
+buster_sightings <- out_df$busters[b_times] |> 
+  sapply(function(x) rnorm(1, x, 0.01)) |> # imperfect sightings
+  sapply(function(x) max(0,x))
+
+g_times <- sample(c(1:max(times)), 5) |> 
+  sort()
+
+ghost_sightings <- out_df$ghosts[g_times] |> 
+  sapply(function(x) rnorm(1, x, 2)) |> 
+  sapply(function(x) max(0,x))
+
+# Plot the results
+ggplot() +
+  geom_line(
+    data = out_df,
+    aes(y = ghosts, color = "Ghosts", x= time)
+  ) +
+  geom_line(
+    data = out_df,
+    aes(y = busters, color = "Busters", x= time)
+  ) +
+  geom_point(
+    aes(
+      x = b_times,
+      y = buster_sightings,
+      color = "Busters"
+    )
+  )+
+  geom_point(
+    aes(
+      x = g_times,
+      y = ghost_sightings,
+      color = "Ghosts"
+    )
+  )+
+  labs(x = "Time", y = "Group Density") +
+  scale_color_manual("", 
+                     breaks = c("Ghosts", "Busters"),
+                     values = c("blue", "red")) +
+  theme_minimal()
+
+```

@@ -25,7 +25,7 @@ bite_data <- list(
   y = bites
 )
 
-zombie_fit <- stan('./stan/ex01_single-param.stan', 'zombie-mod', data = bite_data, iter = 3000, warmup = 1000)
+zombie_fit <- stan('./stan/ex01_zombie-prop.stan', 'zombie-mod', data = bite_data, iter = 3000, warmup = 1000)
 
 # I save the data to use later for website building purposes so I don't have to compile and run stan everytime I render website.
 # but you don't need to save the data if you analyze it below as shown.
@@ -81,7 +81,13 @@ bigf_obs = rnorm(bigf_ss, bigf_mean, bigf_sd)
 
 
 ggplot() +
-
+  geom_histogram(
+    aes(x = yeti_obs, fill = 'yeti') , alpha = 0.5
+  ) +
+  geom_histogram(
+    aes(x = bigf_obs, fill = 'bigfoot'), alpha = 0.5
+  )+
+    scale_fill_manual(values = c('brown', 'lightblue'), breaks = c('bigfoot', 'yeti'))+
   labs(x = 'kg', y = "Number of indv.", fill = "") +
   theme_minimal()
 
@@ -103,7 +109,7 @@ monster_fit <- stan(
   warmup = 500
 )
 monster_fit
-saveRDS(monster_fit)
+saveRDS(monster_fit, './data/ex01_two-monstergroups.rds')
 monster_posterior <- extract(monster_fit)
 
 ggplot() +

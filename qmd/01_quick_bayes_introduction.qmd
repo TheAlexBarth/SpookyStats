@@ -1,5 +1,5 @@
 ---
-title: Probably Useful - Quick comments about probability
+title: Probably Useful Information
 ---
 
 # Probability

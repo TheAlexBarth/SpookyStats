@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Single Parameter Estimation – Spooky Stats</title>
+<title>What do we know about monsters? – Spooky Stats</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -69,10 +69,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -143,7 +143,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ex01_single-parameter.html">Spooky Stuff!</a></li><li class="breadcrumb-item"><a href="./ex01_single-parameter.html">Single Parameter Estimation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ex01_single-parameter.html">Spooky Stuff!</a></li><li class="breadcrumb-item"><a href="./ex01_single-parameter.html">What do we know about monsters?</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -178,7 +178,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./01_quick_bayes_introduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Probably Useful - Quick comments about probability</span></a>
+ <span class="menu-text">Probably Useful Information</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -207,7 +207,25 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ex01_single-parameter.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Single Parameter Estimation</span></a>
+ <span class="menu-text">What do we know about monsters?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ex02_hierarchical.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hierarchical Horns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ex03_linear-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chased by zombies</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ex04_logit-occs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Do you believe in ghosts?</span></a>
   </div>
 </li>
       </ul>
@@ -241,16 +259,16 @@ window.Quarto = {
   <ul>
   <li><a href="#zombie-bites---estimating-a-binomial-probability" id="toc-zombie-bites---estimating-a-binomial-probability" class="nav-link active" data-scroll-target="#zombie-bites---estimating-a-binomial-probability">Zombie bites - Estimating a binomial probability</a></li>
   <li><a href="#werewolf-weights---estimating-a-mean-value" id="toc-werewolf-weights---estimating-a-mean-value" class="nav-link" data-scroll-target="#werewolf-weights---estimating-a-mean-value">Werewolf weights - Estimating a mean value</a></li>
-  <li><a href="#yeti-vs-bigfoot---comparing-two-groups" id="toc-yeti-vs-bigfoot---comparing-two-groups" class="nav-link" data-scroll-target="#yeti-vs-bigfoot---comparing-two-groups">Yeti vs Bigfoot - comparing two groups</a></li>
+  <li><a href="#yeti-vs-bigfoot---comparing-two-groups" id="toc-yeti-vs-bigfoot---comparing-two-groups" class="nav-link" data-scroll-target="#yeti-vs-bigfoot---comparing-two-groups">Yeti vs Bigfoot - Comparing Two Groups</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ex01_single-parameter.html">Spooky Stuff!</a></li><li class="breadcrumb-item"><a href="./ex01_single-parameter.html">Single Parameter Estimation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ex01_single-parameter.html">Spooky Stuff!</a></li><li class="breadcrumb-item"><a href="./ex01_single-parameter.html">What do we know about monsters?</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Single Parameter Estimation</h1>
+<h1 class="title">What do we know about monsters?</h1>
 </div>
 
 
@@ -309,8 +327,7 @@ Parameter \ Model \ &amp;\{ \theta \sim beta(2,2)
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <div class="cell">
-<pre class="text cell-code"><code>// This is saved as a .stan file
-data {
+<pre class="text cell-code"><code>data {
   int&lt;lower=0&gt; n;         // Number of trials
   array[n] int&lt;lower=0, upper=1&gt; y; // Observed outcomes (0 or 1)
 }
@@ -340,16 +357,39 @@ model {
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>zombie_fit <span class="ot">&lt;-</span> <span class="fu">stan</span>(<span class="st">'./stan/ex01_single-param.stan'</span>, <span class="st">'zombie-mod'</span>, <span class="at">data =</span> bite_data, <span class="at">iter =</span> <span class="dv">3000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'lubridate'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union</code></pre>
+</div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Inference for Stan model: zombie-mod.
 4 chains, each with iter=3000; warmup=1000; thin=1; 
 post-warmup draws per chain=2000, total post-warmup draws=8000.
 
        mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
-p      0.66    0.00 0.07   0.52   0.61   0.66   0.70   0.78  2481    1
-lp__ -33.32    0.01 0.73 -35.33 -33.49 -33.03 -32.85 -32.80  3864    1
+p      0.66    0.00 0.06   0.52   0.61   0.66   0.70   0.78  2809    1
+lp__ -33.29    0.01 0.67 -35.19 -33.46 -33.03 -32.85 -32.80  3952    1
 
-Samples were drawn using NUTS(diag_e) at Mon Oct 28 19:58:08 2024.
+Samples were drawn using NUTS(diag_e) at Wed Oct 30 23:54:43 2024.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>
@@ -358,14 +398,14 @@ convergence, Rhat=1).</code></pre>
 <p>The text which follows our model output gives us a lot of useful information both to the posterior values and model convergence diagnostics.</p>
 <p>We can also visualize the distribution estimated by the posterior value. I’ve added a vertical red line for the true value, but in most real cases, you don’t know the “true” value.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get posterior for the estimates of p</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>zombie_p_post <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(zombie_fit)<span class="sc">$</span>p</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">posterior_param_plot</span>(zombie_p_post, dbeta, <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">length.out =</span> <span class="dv">1000</span>), p, <span class="at">shape1 =</span> <span class="dv">2</span>, <span class="at">shape2 =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get posterior for the estimates of p</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>zombie_p_post <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(zombie_fit)<span class="sc">$</span>p</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">posterior_param_plot</span>(zombie_p_post, dbeta, <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">length.out =</span> <span class="dv">1000</span>), p, <span class="at">shape1 =</span> <span class="dv">2</span>, <span class="at">shape2 =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="ex01_single-parameter_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="ex01_single-parameter_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -375,7 +415,7 @@ convergence, Rhat=1).</code></pre>
 <div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
 <p>For fun, I’ll add a frequentist comparison:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.test</span>(<span class="at">x =</span> <span class="fu">sum</span>(bites), <span class="at">n =</span> <span class="fu">length</span>(bites))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.test</span>(<span class="at">x =</span> <span class="fu">sum</span>(bites), <span class="at">n =</span> <span class="fu">length</span>(bites))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     1-sample proportions test with continuity correction
@@ -400,18 +440,372 @@ sample estimates:
 <h1>Werewolf weights - Estimating a mean value</h1>
 <p>I’ve googled around and found that werewolfs are up to 180kg. Let’s simulate some data to reflect this.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Data Simulation</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Data Simulation</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Model Structure</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Stan</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">Analysis</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false">Model Checking</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <p>Given the fact they are <em>up to</em> 180kg, let’s assume they are average 140 with a standard deviation of 15kg - a pretty big range!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">150</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>werewolfs <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>obs_wereweight <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(werewolfs, mu, sigma)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> obs_wereweight)) <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">'Werewolf Weight (kg)'</span>) <span class="sc">+</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex01_single-parameter_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>The overall idea here is similar, but now we are estimating both the variation and mean value</p>
+<p><span class="math display">\[
+\begin{align}
+y &amp;\sim \mathcal{N}(\mu, \sigma^2)\\
+\\
+\mu &amp;\sim \mathcal{N}(150, 40) \\
+\sigma &amp;\sim \mathcal{N}(30,10)
+\end{align}
+\]</span></p>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode txt code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>data {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  int&lt;lower=0&gt; n;            // Number of observations</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  array[n] real y;                 // Observed data</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>parameters {</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  real mu;</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  real sigma;</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>model {</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    sigma ~ normal(30, 10);</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    mu ~ normal(150, 30);</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    y ~ normal(mu, sigma);</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>were_stan_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">n =</span> werewolfs,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> obs_wereweight</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>were_fit <span class="ot">&lt;-</span> <span class="fu">stan</span>(</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">'./stan/ex01_wereweight.stan'</span>, <span class="st">'wereweight'</span>, </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> were_stan_data, <span class="at">iter =</span> <span class="dv">3000</span>, <span class="at">warmup =</span> <span class="dv">500</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>posterior_wolfs <span class="ot">&lt;-</span> <span class="fu">extract</span>(were_fit) </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="fu">posterior_param_plot</span>(</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  posterior_wolfs<span class="sc">$</span>mu, dnorm, </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">seq</span>(<span class="dv">100</span>, <span class="dv">190</span>, <span class="at">length.out =</span> <span class="dv">10000</span>), mu,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean =</span> <span class="dv">150</span>, <span class="at">sd =</span> <span class="dv">30</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="fu">posterior_param_plot</span>(</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  posterior_wolfs<span class="sc">$</span>sigma, dnorm, </span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">seq</span>(<span class="dv">5</span>, <span class="dv">40</span>, <span class="at">length.out =</span> <span class="dv">10000</span>), sigma, <span class="at">mean =</span> <span class="dv">30</span>, <span class="at">sd =</span> <span class="dv">10</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex01_single-parameter_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex01_single-parameter_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>So we can see</p>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<p>I’m not going to go through a whole model checking feature for every example. However, I’ll again show right here the basic things to look at:</p>
+<ol type="1">
+<li><p>Does it match our observations? Yes, not super exciting with simulated data but something worth considering</p></li>
+<li><p>Did the model converge?</p></li>
+</ol>
+<p>First we can look at the initial output which has all sorts of convergence diagnostics:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>were_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Inference for Stan model: wereweight.
+4 chains, each with iter=3000; warmup=500; thin=1; 
+post-warmup draws per chain=2500, total post-warmup draws=10000.
+
+         mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
+mu     149.23    0.03 2.19  144.90  147.77  149.26  150.69  153.58  6334    1
+sigma   15.59    0.02 1.68   12.66   14.43   15.45   16.59   19.31  6256    1
+lp__  -161.42    0.02 1.03 -164.18 -161.83 -161.11 -160.68 -160.41  3819    1
+
+Samples were drawn using NUTS(diag_e) at Wed Oct 30 23:55:00 2024.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).</code></pre>
+</div>
+</div>
+<p>We see the Rhat values are high and the n_eff (ESS) is high</p>
+<p>We also can take a look at trace plots</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>bayesplot<span class="sc">::</span><span class="fu">mcmc_trace</span>(were_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex01_single-parameter_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 </section>
 <section id="yeti-vs-bigfoot---comparing-two-groups" class="level1">
-<h1>Yeti vs Bigfoot - comparing two groups</h1>
+<h1>Yeti vs Bigfoot - Comparing Two Groups</h1>
 <p>Let’s say we had a debate about who was bigger - Yeti or Bigfoot.</p>
-<p>After googling and reading some strange websites, I’ve found that Well, I can simulate some data to</p>
+<p>After googling and reading some strange websites, I’ve found that there’s quite a range. Bigfoot is pretty consensus at around 220-300kg. Yetis are a bit different. There’s some reports of them being well over 400kg, but other reports that they’re much smaller and, in fact, cuddly.</p>
+<p>Well, I can simulate some data to mimick this range. Then we can analyze it!</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Data Simulation</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Model</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Stan Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false">Analysis</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1031</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># yetis are log-normal distributed</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>yeti_lmean <span class="ot">=</span> <span class="fu">log</span>(<span class="dv">130</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>yeti_lsd <span class="ot">=</span> <span class="fu">log</span>(<span class="dv">3</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>yeti_ss <span class="ot">=</span> <span class="dv">25</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>yeti_obs <span class="ot">=</span> <span class="fu">rlnorm</span>(yeti_ss, yeti_lmean, yeti_lsd)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>bigf_mean <span class="ot">=</span> <span class="dv">260</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>bigf_sd <span class="ot">=</span> <span class="dv">20</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>bigf_ss <span class="ot">=</span> <span class="dv">50</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>bigf_obs <span class="ot">=</span> <span class="fu">rnorm</span>(bigf_ss, bigf_mean, bigf_sd)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>I’ve simulated the data to have a lognomal distribution for Yetis, so most will be small but some may be really big. Also because there’s less yetis than bigfeet (common knowledge), we only observe 25 yetis. Bigfoot is more normal and commonly observed.</p>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<p>Before I define the model, I want to make a quick frequentist comparison to illustrate the power in Bayesian analysis.</p>
+<p>If we want to compare two groups, you might immediately think: t-test!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(bigf_obs, yeti_obs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  bigf_obs and yeti_obs
+t = 0.076769, df = 24.187, p-value = 0.9394
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -87.90220  94.69695
+sample estimates:
+mean of x mean of y 
+ 252.9210  249.5237 </code></pre>
+</div>
+</div>
+<p>Hmm - a few things to consider here. First - the p-value is very high, suggesting we have no reason to believe from this sample data our two groups have a different value. Well, technically, I did simulate their means to be close, but the have such different distributions, it’s not a good comparison. Second, even if means were appropriate, we shouldn’t be doing a t-test anyways because one of the core assumptions of a t-test is equal variances in our groups:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var.test</span>(bigf_obs, yeti_obs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    F test to compare two variances
+
+data:  bigf_obs and yeti_obs
+F = 0.0077948, num df = 49, denom df = 24, p-value &lt; 2.2e-16
+alternative hypothesis: true ratio of variances is not equal to 1
+95 percent confidence interval:
+ 0.003694251 0.015102167
+sample estimates:
+ratio of variances 
+        0.00779483 </code></pre>
+</div>
+</div>
+<p>Clearly not equal variances!</p>
+<p>What we really should be using to compare our yetis and our bigfeet is the median weights of their population. That could be done using some non-parametric test, but these usually require equal sample sizes between groups - so that is not an option. Technically, you can bootstrap your samples for a median, but that’s outside the standard frequentist approach.</p>
+<p>This is where we are starting to get a little fun with what we can do with a bayesian model. Since we are interested in comparing certain features of the posterior distribution, we can actually use our posterior.</p>
+<p>First we can model the data into our bayesian framework:</p>
+<p>$$</p>
+<p><span class="math display">\[\begin{align}
+y_i &amp;\sim \mathcal{logN}(\mu_y, \sigma_y)\\
+b_i &amp;\sim \mathcal{N}(\mu_b, \sigma_b)\\
+\\
+log(\mu_y) &amp;\sim \mathcal{N}(200, 7.38) \\
+log(\sigma_y) &amp;\sim \mathcal{N}(1, 7.38) \\
+
+\mu_b &amp;\sim \mathcal{N}(200, 10) \\
+\sigma_b &amp;\sim \mathcal{N}(0, 20)
+\end{align}\]</span></p>
+<p>$$</p>
+<p>So ulimately, I’m interested in comparing the means and we can use the posterior distributions to accomplish this if <span class="math inline">\(E(f([\cdot]))\)</span> is used to define the expected value of the median for each distribution.</p>
+<p><span class="math display">\[
+E(f([\mu_y | y_i])) - E(f([\mu_g | g_i]))
+\]</span></p>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<pre class="text cell-code"><code>data {
+  int&lt;lower=0&gt; N_yeti;
+  int&lt;lower=0&gt; N_bigf;
+  array[N_yeti] real&lt;lower=0&gt; yeti_obs;
+  array[N_bigf] real bigf_obs;
+}
+
+parameters {
+  // Parameters for the Yeti (log-normal distribution)
+  real log_mean;
+  real&lt;lower=0&gt; log_sd;
+  
+  // Parameters for the Bigfoot (normal distribution)
+  real bigf_mean;
+  real&lt;lower=0&gt; bigf_sd;
+}
+
+transformed parameters {
+  real yeti_median = exp(log_mean);
+}
+
+model {
+  // Priors (vague priors, adjust if you have prior knowledge)
+  log_mean ~ normal(5.3, 2);        // Prior on log-mean of Yetis
+  log_sd ~ normal(0, 2);            // Prior on log-SD of Yetis
+  bigf_mean ~ normal(200, 10);      // Prior on Bigfoot mean
+  bigf_sd ~ normal(0, 20);          // Prior on Bigfoot SD
+  
+  // Likelihoods
+  yeti_obs ~ lognormal(log_mean, log_sd);
+  bigf_obs ~ normal(bigf_mean, bigf_sd);
+}
+
+generated quantities {
+  // Difference in means on the original scale
+  real median_diff = yeti_median - bigf_mean;
+}</code></pre>
+</div>
+<p>Note in the stan code I compare median to mean but the mean and median are equal in a normal distribution.</p>
+</div>
+<div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># \- Prepare data for stan ------------------</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>monster_stan_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_yeti =</span> yeti_ss,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_bigf =</span> bigf_ss,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">yeti_obs =</span> yeti_obs,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">bigf_obs =</span> bigf_obs</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>monster_fit <span class="ot">&lt;-</span> <span class="fu">stan</span>(</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">'./stan/ex01_two-monsters.stan'</span>,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">'monsters'</span>,</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> monster_stan_data,</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">3000</span>,</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">warmup =</span> <span class="dv">500</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>monster_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Inference for Stan model: monsters.
+4 chains, each with iter=3000; warmup=500; thin=1; 
+post-warmup draws per chain=2500, total post-warmup draws=10000.
+
+               mean se_mean    sd    2.5%     25%     50%     75%   97.5% n_eff
+log_mean       4.43    0.00  0.28    3.87    4.25    4.43    4.61    4.96  9637
+log_sd         1.39    0.00  0.21    1.06    1.24    1.37    1.52    1.88  8275
+bigf_mean    252.08    0.04  3.40  245.06  249.88  252.21  254.43  258.37  9069
+bigf_sd       24.03    0.03  2.61   19.64   22.21   23.81   25.61   29.79  8734
+yeti_median   86.78    0.25 24.40   48.13   69.82   83.71  100.11  143.29  9604
+median_diff -165.30    0.25 24.57 -204.77 -182.35 -168.30 -151.98 -108.97  9596
+lp__        -238.46    0.02  1.44 -242.14 -239.17 -238.13 -237.40 -236.68  4842
+            Rhat
+log_mean       1
+log_sd         1
+bigf_mean      1
+bigf_sd        1
+yeti_median    1
+median_diff    1
+lp__           1
+
+Samples were drawn using NUTS(diag_e) at Wed Oct 30 23:55:17 2024.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).</code></pre>
+</div>
+</div>
+<p>We can see from these quick diagnostics, it ran well. Let’s visualize the two distributions and</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>monster_posterior <span class="ot">&lt;-</span> rstan<span class="sc">::</span><span class="fu">extract</span>(monster_fit)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> monster_posterior<span class="sc">$</span>bigf_mean, <span class="at">fill =</span> <span class="st">'bigfoot'</span>),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.5</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> monster_posterior<span class="sc">$</span>yeti_median, <span class="at">fill =</span> <span class="st">'yeti'</span>),</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.5</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">mean</span>(monster_posterior<span class="sc">$</span>bigf_mean), <span class="at">color =</span> <span class="st">'bigfoot'</span>, <span class="at">y =</span> <span class="dv">0</span>), <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">mean</span>(monster_posterior<span class="sc">$</span>yeti_median), <span class="at">color =</span> <span class="st">'yeti'</span>, <span class="at">y =</span> <span class="dv">0</span>), <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="dv">0</span>, <span class="at">yend =</span> <span class="dv">0</span>, </span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> HDInterval<span class="sc">::</span><span class="fu">hdi</span>(monster_posterior<span class="sc">$</span>bigf_mean)[<span class="dv">1</span>], </span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">xend =</span> HDInterval<span class="sc">::</span><span class="fu">hdi</span>(monster_posterior<span class="sc">$</span>bigf_mean)[<span class="dv">2</span>],</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">'bigfoot'</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">1.5</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="dv">0</span>, <span class="at">yend =</span> <span class="dv">0</span>, </span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> HDInterval<span class="sc">::</span><span class="fu">hdi</span>(monster_posterior<span class="sc">$</span>yeti_median)[<span class="dv">1</span>], </span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">xend =</span> HDInterval<span class="sc">::</span><span class="fu">hdi</span>(monster_posterior<span class="sc">$</span>yeti_median)[<span class="dv">2</span>], </span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">'yeti'</span></span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">1.5</span></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">+</span></span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">'brown'</span>, <span class="st">'lightblue'</span>), <span class="at">breaks =</span> <span class="fu">c</span>(<span class="st">'bigfoot'</span>, <span class="st">'yeti'</span>))<span class="sc">+</span></span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">'brown'</span>, <span class="st">'lightblue'</span>), <span class="at">breaks =</span> <span class="fu">c</span>(<span class="st">'bigfoot'</span>, <span class="st">'yeti'</span>))<span class="sc">+</span></span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Median Posterior Mass (kg)"</span>, <span class="at">y =</span> <span class="st">""</span>, <span class="at">fill =</span> <span class="st">""</span>, <span class="at">color =</span> <span class="st">''</span>) <span class="sc">+</span></span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'top'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="ex01_single-parameter_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Posterior distribution for the two monsters. Bottom lines show high density 95% credible interval of the posterior median value. Also shown as points are individual observations along the x-axis.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>```</p>
+</div>
+</div>
+</div>
 
 
 </section>

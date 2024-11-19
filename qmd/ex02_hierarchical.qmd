@@ -1,5 +1,5 @@
 ---
-title: Adding Levels
+title: Hierarchical Horns
 ---
 
 Hierarchical models are really where we start to unlock the power of bayesian analyses. The crux of a hierarchical model is to identify some population can be either made up of multiple sub-populations or maybe part of multiple larger groups. A hierarchical model allows us to identify variation across these different groups
@@ -8,7 +8,197 @@ Hierarchical models are really where we start to unlock the power of bayesian an
 
 I'm diverging from the spooky examples now going to look at longhorns around different ranches. We are interested in the length of steers' horns - maybe Bevo wants to make sure he has no competition!
 
-It's all the same species, but we can imagine three different ranches which hold longhorn cattle. Let's say longhorns have an average horn length of 30cm with a standard deviation of 4cm. But we have three ranches. The ranches may all have a different mean value for their cattle, which is some variation of the group mean.
+It's all the same species, but we can imagine three different ranches which hold longhorn cattle. Let's say longhorns have an average horn length of 30cm with a standard deviation of 4cm. But we have three ranches. The ranches may all have a different mean value for their cattle, which is some variation of the group mean. I tried really hard to find some data on actual longhorns. However, there is little public information. If anyone wants to go out and measure on the ranch outside Aransas Pass, I'd appreciate it.
+
+So we still simulate data:
+
+
+:::{.panel-tabset}
+
+### Data simulation
+
+```{r}
+set.seed(1031)
+
+rm(list = ls())
+library(ggplot2)
+library(rstan)
+library(dplyr)
+library(bayesplot)
+library(tidyr)
+source('../R/utils.R') #double check this path if you copied
+
+
+#######
+# Different ranches with steers
+#######
+
+# Define parameters
+global_mean <- 30
+n_ranches <- 3
+cows_per_ranch <- 15
+sigma_ranch <- 5 # ranch level variation
+sigma_cow <- 2 # individual variation
+
+# simulate ranch specific means with ranch-variation
+ranch_means <- rnorm(n_ranches, global_mean, sigma_ranch)
+
+# Simulate data
+ranch_data <- data.frame(
+  ranch = rep(c(1:n_ranches), each = cows_per_ranch),
+  cow_id = 1:(n_ranches * cows_per_ranch),
+  horns = c(1:n_ranches) |> 
+    lapply(function(r) rnorm(cows_per_ranch, ranch_means[r], sigma_cow)) |> 
+    unlist()
+)
+
+ggplot(ranch_data) +
+  geom_histogram(
+    aes(
+      x = horns, 
+      fill = ranch
+    ),
+    alpha = 0.5
+  ) +
+  facet_wrap(.~ranch) +
+  labs(x = "Horn Length (cm)", y = "Count")+
+  theme_minimal() +
+  theme(legend.position = 'none')
+
+```
+
+We can see, there some global level of a mean, but it varies by ranch!
+
+
+### Model 
+
+So now things start getting a little long with terminology. We'll call our steer horn lengths $y_{ij}$ for all $i$ observations from each $j$ ranch. Each steer's horns come from some variaton common across all steers, $\sigma$. Each ranch has a mean $\mu_j$, which is drawn from the global mean of all longhorn horns, $\gamma$. The ranch mean is drawn from a distribution of ranches, with variation $\epsilon$
+
+$$
+\begin{align}
+
+y_i &\sim \mathcal{N}(\mu_j, \sigma)\\
+
+\mu_j &\sim \mathcal{N}(\gamma, \tau)\\
+\gamma &\sim \mathcal{N}(0,15)\\
+\tau &\sim \mathcal{N}(0, 15)
+
+\end{align}
+$$
+
+In this structure, you may here $\gamma$ or $\tau$ referred to as hyperparameters or that they are specified from hyperpriors, which influence the lower observations!
+
+It is also common and helpful to draw diagrams (DAGs) to reflect the structure, but I haven't found a good way to do that on the computer yet.
+
+### Stan code
+
+```{text, eval = F}
+data {
+  int<lower=0> n_steers;
+  int<lower=1> n_ranches;
+  array[n_steers] int<lower=1,upper = n_ranches> ranch_id;
+  vector[n_steers] obs_horns;
+}
+
+parameters {
+  real mu_global;
+  vector[n_ranches] ranch_means;
+  real<lower=0> sigma_cow;
+  real<lower=0> sigma_ranch;
+}
+
+model {
+  // Priors
+  mu_global ~ normal(30, 20);
+  ranch_means ~ normal(mu_global, sigma_ranch);
+  sigma_cow ~ normal(0, 15);
+  sigma_ranch ~ normal(0, 15);
+
+  // Likelihood
+  for (n in 1:n_steers) {
+    obs_horns[n] ~ normal(ranch_means[ranch_id[n]], sigma_cow);
+  }
+}
+```
+
+### Analysis
+
+```{r, eval= F}
+
+# \- Stan analysis ------------
+horn_stan_data <- list(
+  n_steers = nrow(ranch_data),
+  n_ranches = n_ranches,
+  ranch_id = ranch_data$ranch,
+  obs_horns = ranch_data$horns
+)
+
+horn_fit <- stan(
+  './stan/ex02_ranch-horns.stan',
+  'ranch-horns',
+  data = horn_stan_data,
+  iter = 5000,
+  warmup = 1000
+)
+```
+
+```{r, echo = F}
+horn_fit = readRDS('../data/ex02_longhorn-ranches.rds')
+horn_fit
+```
+
+
+We have a lot to parse apart here, but let's look at a visual:
+
+```{r}
+
+horn_post = rstan::extract(horn_fit)
+
+ggplot() +
+  geom_density(
+    aes(x = horn_post$mu_global),
+    fill = 'grey', alpha = 0.5
+  )+
+  geom_density(
+    data = horn_post$ranch_means |> 
+      as.data.frame() |> 
+      pivot_longer(
+        cols = everything(),
+        names_to = 'Ranch', values_to = 'horn_length'
+      ) |> 
+      mutate(Ranch = gsub('V', '', .data$Ranch)),
+    aes(x = horn_length, fill = Ranch),
+    alpha = 0.5
+  ) +
+  geom_vline(
+    aes(xintercept = ranch_means, color = as.character(c(1:3))),
+    linewidth = 2
+  ) +
+  #I'm truncating te y xis for clarity
+  scale_x_continuous(limits = c(20, 40)) +
+  labs(x = 'Horn Length (cm)', y = "") +
+  theme_minimal()
+```
+
+We can see in this figure our individual ranch mean posteriors, with the global posterior shown behind in grey. True values are vertical lines.
+
+One thing also to consider here is that we simulated the data to all have roughly similar observations. However, a nice feature of a hierarchical set up is the idea of shrinkage - if there is a global level mean, but few observations for a group/individual level mean, those values can effectively borrow from the better observed groups and shink towards the global mean. Conversely it would be difficult to estimate mean with small sample sizes in a frequentist approach.
+
+### Model Checking
+
+Also we can do a quick trace plot to see how it ran:
+
+```{r}
+horn_fit |> 
+  mcmc_trace(
+    pars = c(
+      'mu_global', paste0("ranch_means[", 1:3, ']'),
+      'sigma_cow', 'sigma_ranch'
+    )
+  )
+```
+
+
 
 ### Take it higher
 
@@ -32,6 +222,12 @@ y_{ij} &\sim \mathcal{N}(\mu_{j}, \sigma)\\
 \end{align}
 $$
 
-In this case we have a global mean for all longhorns, but it falls up to be the intercept of our model for $\phi$, which is then impacted by an effect of longhorn-type $\beta_g$ where $g$ is either cow, bull, or steer. Each effect of $\beta_g$ has it's own prior distribution. I added ranch-level variation as $\epsilon$. Although it could have been more explicitly incorporated. Also, I said there was individual variation $\sigma$ which is equal across all ranches and groups, but maybe this isn't the case, you could then include some hierarchical structure for individual variation!
+In this case we have a global mean for all longhorns, but it falls up to be the intercept of our model for $\phi$, which is then impacted by an effect of longhorn-type $\beta_g$ where $g$ is either cow, bull, or steer. Each effect of $\beta_g$ has it's own prior distribution. I added ranch-level variation as $\epsilon$. Although it could have been more explicitly incorporated. This is a now nested linear model in this system - we'll look at that next.
+
+
+Also, I said there was individual variation $\sigma$ which is equal across all ranches and groups, but maybe this isn't the case, you could then include some hierarchical structure for individual variation!
 
 You can see how this quickly can spiral into a larger structure!
+
+:::
+

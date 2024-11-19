@@ -1,5 +1,5 @@
 ---
-title: Single Parameter Estimation
+title: What do we know about monsters?
 ---
 
 # Zombie bites - Estimating a binomial probability
@@ -52,7 +52,6 @@ $$
 ### Stan Code
 
 ```{text, eval=F}
-// This is saved as a .stan file
 data {
   int<lower=0> n;         // Number of trials
   array[n] int<lower=0, upper=1> y; // Observed outcomes (0 or 1)
@@ -87,7 +86,7 @@ zombie_fit <- stan('./stan/ex01_single-param.stan', 'zombie-mod', data = bite_da
 
 ```
 
-```{r, echo = F, supress.}
+```{r, echo = F}
 set.seed(1031)
 suppressMessages(library(ggplot2))
 suppressMessages(library(bayesplot))
@@ -135,22 +134,319 @@ So in this case, it is not really that different than our Bayesian analysis, jus
 :::
 
 # Werewolf weights - Estimating a mean value
+
 I've googled around and found that werewolfs are up to 180kg. Let's simulate some data to reflect this.
 
-:::{.panel-tabset}
-
+::: panel-tabset
 ### Data Simulation
+
 Given the fact they are *up to* 180kg, let's assume they are average 140 with a standard deviation of 15kg - a pretty big range!
+
 ```{r}
 
+
+mu <- 150
+sigma <- 15
+
+werewolfs <- 50
+obs_wereweight <- rnorm(werewolfs, mu, sigma)
+
+ggplot() +
+  geom_histogram(aes(x = obs_wereweight)) +
+  labs(x = 'Werewolf Weight (kg)') +
+  theme_minimal()
+
+```
+
+### Model Structure
+
+The overall idea here is similar, but now we are estimating both the variation and mean value
+
+$$
+\begin{align}
+y &\sim \mathcal{N}(\mu, \sigma^2)\\
+\\
+\mu &\sim \mathcal{N}(150, 40) \\
+\sigma &\sim \mathcal{N}(30,10)
+\end{align} 
+$$
+
+### Stan
+
+```{txt, eval = F}
+data {
+  int<lower=0> n;            // Number of observations
+  array[n] real y;                 // Observed data
+}
+
+parameters {
+  real mu;
+  real sigma;
+}
+
+model {
+    sigma ~ normal(30, 10);
+    mu ~ normal(150, 30);
+    
+    y ~ normal(mu, sigma);
+}
+```
+
+### Analysis
+
+```{r, eval = F}
+were_stan_data <- list(
+  n = werewolfs,
+  y = obs_wereweight
+)
+
+were_fit <- stan(
+  './stan/ex01_wereweight.stan', 'wereweight', 
+  data = were_stan_data, iter = 3000, warmup = 500
+)
+
+posterior_wolfs <- extract(were_fit) 
+posterior_param_plot(
+  posterior_wolfs$mu, dnorm, 
+  seq(100, 190, length.out = 10000), mu,
+  mean = 150, sd = 30
+)
+posterior_param_plot(
+  posterior_wolfs$sigma, dnorm, 
+  seq(5, 40, length.out = 10000), sigma, mean = 30, sd = 10
+)
+```
+
+```{r, echo = F}
+were_fit = readRDS('../data/ex01_werewolf-weight.rds')
+posterior_wolfs <- extract(were_fit) 
+posterior_param_plot(
+  posterior_wolfs$mu, dnorm, 
+  seq(100, 190, length.out = 10000), mu,
+  mean = 150, sd = 30
+)
+posterior_param_plot(
+  posterior_wolfs$sigma, dnorm, 
+  seq(5, 40, length.out = 10000), sigma, mean = 30, sd = 10
+)
+```
+
+So we can see
+
+### Model Checking
+I'm not going to go through a whole model checking feature for every example. However, I'll again show right here the basic things to look at:
+
+1. Does it match our observations?
+Yes, not super exciting with simulated data but something worth considering
+
+2. Did the model converge?
+
+First we can look at the initial output which has all sorts of convergence diagnostics:
+
+```{r}
+were_fit
+```
+
+We see the Rhat values are high and the n_eff (ESS) is high
+
+We also can take a look at trace plots
+
+```{r}
+bayesplot::mcmc_trace(were_fit)
 ```
 
 :::
 
+# Yeti vs Bigfoot - Comparing Two Groups
 
-# Yeti vs Bigfoot - comparing two groups
+Let's say we had a debate about who was bigger - Yeti or Bigfoot.
 
-Let's say we had a debate about who was bigger - Yeti or Bigfoot. 
+After googling and reading some strange websites, I've found that there's quite a range. Bigfoot is pretty consensus at around 220-300kg. Yetis are a bit different. There's some reports of them being well over 400kg, but other reports that they're much smaller and, in fact, cuddly.
 
-After googling and reading some strange websites, I've found that 
-Well, I can simulate some data to 
+Well, I can simulate some data to mimick this range. Then we can analyze it!
+
+:::{.panel-tabset}
+
+### Data Simulation
+
+```{r}
+set.seed(1031)
+
+# yetis are log-normal distributed
+
+yeti_lmean = log(130)
+yeti_lsd = log(3)
+yeti_ss = 25
+yeti_obs = rlnorm(yeti_ss, yeti_lmean, yeti_lsd)
+
+
+bigf_mean = 260
+bigf_sd = 20
+bigf_ss = 50
+bigf_obs = rnorm(bigf_ss, bigf_mean, bigf_sd)
+
+```
+
+I've simulated the data to have a lognomal distribution for Yetis, so most will be small but some may be really big. Also because there's less yetis than bigfeet (common knowledge), we only observe 25 yetis. Bigfoot is more normal and commonly observed.
+
+### Model
+
+Before I define the model, I want to make a quick frequentist comparison to illustrate the power in Bayesian analysis.
+
+If we want to compare two groups, you might immediately think: t-test!
+```{r}
+t.test(bigf_obs, yeti_obs)
+```
+
+Hmm - a few things to consider here. First - the p-value is very high, suggesting we have no reason to believe from this sample data our two groups have a different value. Well, technically, I did simulate their means to be close, but the have such different distributions, it's not a good comparison.
+Second, even if means were appropriate, we shouldn't be doing a t-test anyways because one of the core assumptions of a t-test is equal variances in our groups:
+
+```{r}
+var.test(bigf_obs, yeti_obs)
+```
+
+Clearly not equal variances!
+
+What we really should be using to compare our yetis and our bigfeet is the median weights of their population. That could be done using some non-parametric test, but these usually require equal sample sizes between groups - so that is not an option. Technically, you can bootstrap your samples for a median, but that's outside the standard frequentist approach.
+
+
+This is where we are starting to get a little fun with what we can do with a bayesian model. Since we are interested in comparing certain features of the posterior distribution, we can actually use our posterior. 
+
+First we can model the data into our bayesian framework:
+
+$$
+
+\begin{align}
+y_i &\sim \mathcal{logN}(\mu_y, \sigma_y)\\
+b_i &\sim \mathcal{N}(\mu_b, \sigma_b)\\
+\\
+log(\mu_y) &\sim \mathcal{N}(200, 7.38) \\
+log(\sigma_y) &\sim \mathcal{N}(1, 7.38) \\
+
+\mu_b &\sim \mathcal{N}(200, 10) \\
+\sigma_b &\sim \mathcal{N}(0, 20) 
+\end{align}
+
+$$
+
+So ulimately, I'm interested in comparing the means and we can use the posterior distributions to accomplish this if $E(f([\cdot]))$ is used to define the expected value of the median for each distribution. 
+
+$$
+E(f([\mu_y | y_i])) - E(f([\mu_g | g_i]))
+$$
+
+### Stan Code
+
+```{text, eval = F}
+data {
+  int<lower=0> N_yeti;
+  int<lower=0> N_bigf;
+  array[N_yeti] real<lower=0> yeti_obs;
+  array[N_bigf] real bigf_obs;
+}
+
+parameters {
+  // Parameters for the Yeti (log-normal distribution)
+  real log_mean;
+  real<lower=0> log_sd;
+  
+  // Parameters for the Bigfoot (normal distribution)
+  real bigf_mean;
+  real<lower=0> bigf_sd;
+}
+
+transformed parameters {
+  real yeti_median = exp(log_mean);
+}
+
+model {
+  // Priors (vague priors, adjust if you have prior knowledge)
+  log_mean ~ normal(5.3, 2);        // Prior on log-mean of Yetis
+  log_sd ~ normal(0, 2);            // Prior on log-SD of Yetis
+  bigf_mean ~ normal(200, 10);      // Prior on Bigfoot mean
+  bigf_sd ~ normal(0, 20);          // Prior on Bigfoot SD
+  
+  // Likelihoods
+  yeti_obs ~ lognormal(log_mean, log_sd);
+  bigf_obs ~ normal(bigf_mean, bigf_sd);
+}
+
+generated quantities {
+  // Difference in means on the original scale
+  real median_diff = yeti_median - bigf_mean;
+}
+```
+
+Note in the stan code I compare median to mean but the mean and median are equal in a normal distribution.
+
+### Analysis
+
+```{r, eval = F}
+# \- Prepare data for stan ------------------
+
+monster_stan_data <- list(
+  N_yeti = yeti_ss,
+  N_bigf = bigf_ss,
+  yeti_obs = yeti_obs,
+  bigf_obs = bigf_obs
+)
+
+
+monster_fit <- stan(
+  './stan/ex01_two-monsters.stan',
+  'monsters',
+  data = monster_stan_data,
+  iter = 3000,
+  warmup = 500
+)
+monster_fit
+```
+
+```{r, echo = F}
+monster_fit = readRDS('../data/ex01_two-monstergroups.rds')
+monster_fit
+```
+
+We can see from these quick diagnostics, it ran well. Let's visualize the two distributions and 
+
+```{r, fig.cap = 'Posterior distribution for the two monsters. Bottom lines show high density 95% credible interval of the posterior median value. Also shown as points are individual observations along the x-axis.'}
+monster_posterior <- rstan::extract(monster_fit)
+ggplot() +
+  geom_density(
+    aes(x = monster_posterior$bigf_mean, fill = 'bigfoot'),
+    alpha = 0.5
+  ) + 
+  geom_density(
+    aes(x = monster_posterior$yeti_median, fill = 'yeti'),
+    alpha = 0.5
+  ) + 
+  geom_point(aes(x = mean(monster_posterior$bigf_mean), color = 'bigfoot', y = 0), size = 4) +
+  geom_point(aes(x = mean(monster_posterior$yeti_median), color = 'yeti', y = 0), size = 4) +
+  geom_segment(
+    aes(
+      y = 0, yend = 0, 
+      x = HDInterval::hdi(monster_posterior$bigf_mean)[1], 
+      xend = HDInterval::hdi(monster_posterior$bigf_mean)[2],
+      color = 'bigfoot'
+    ),
+    linewidth = 1.5
+  ) +
+  geom_segment(
+    aes(
+      y = 0, yend = 0, 
+      x = HDInterval::hdi(monster_posterior$yeti_median)[1], 
+      xend = HDInterval::hdi(monster_posterior$yeti_median)[2], 
+      color = 'yeti'
+    ),
+    linewidth = 1.5
+  )+
+  scale_fill_manual(values = c('brown', 'lightblue'), breaks = c('bigfoot', 'yeti'))+
+  scale_color_manual(values = c('brown', 'lightblue'), breaks = c('bigfoot', 'yeti'))+
+  labs(x = "Median Posterior Mass (kg)", y = "", fill = "", color = '') +
+  theme_minimal() +
+  theme(legend.position = 'top')
+```
+
+```
+
+:::

@@ -1,20 +1,378 @@
 ---
-title: Regression
+title: Chased by zombies
 ---
 
 # Zombie Speed - Linear Regression
 
-## Single Case
+Now let's image a zombie is chasing you. It'd be good to know how fast a zombie can run. Well, they are definitely motived by hunger. So we can predict that they will run faster if they haven't eaten for a while. Let's simulate the data and take a look:
 
 
-## Hierarchical Case
+# Single Case
+
+:::{.panel-tabset}
+
+### Data Simulation
+```{r}
+set.seed(1031)
+library(ggplot2) |> suppressMessages()
+library(bayesplot) |> suppressMessages()
+library(rstan) |> suppressMessages()
+library(ggpubr) |> suppressMessages()
+
+rm(list = ls())
+source('../R/utils.R') |> suppressMessages()
 
 
 
-# Is there a ghost? - Logisitic Regression
+####
+# Single Case Zombie Speed #####
+####
 
-## Single Case
+
+beta_0 = 2.0
+beta_1 = 0.5
+sigma = 1
+
+n_zombies = 100
+hours_since = rnorm(n_zombies, mean = 10, sd= 2) # simulate number of hours
+speed = hours_since |> sapply(function(x) rnorm(1,beta_0 + beta_1 * x,sigma))
 
 
-## What if we missed them? - Occupancy Models
+# simulated data
+ggplot() +
+  geom_point(aes(x = hours_since, y = speed)) +
+  stat_smooth(aes(x = hours_since, y = speed), method = 'lm', color = '#5BD08D') +
+  labs(x= 'Hours since eating', y = 'Speed [mph]')+
+  theme_minimal()
+```
 
+In this we can use ggplot to show the line of best fit as calculated by OLS, like a normal regression fit.
+
+### Model
+
+Now we are interested in estimating three parameters related to our model. We have the intercept $\beta_0$, which is the speed immediately after eating, then we have the $\beta_1$ slope and variation between individual zombies, $\sigma$.
+
+Here I set weakly informative priors:
+
+$$
+\begin{align}
+y_i &\sim \mathcal{N}(\mu_i, \sigma)\\
+\mu_i &= \beta_0 + \beta_1 * x_i\\
+\beta_0 &\sim \mathcal{N}(8,4)\\
+\beta_1 &\sim \mathcal{N}(0,10)\\
+\sigma &\sim \mathcal{N}(0,5)
+\end{align}
+$$
+
+### Stan Code
+
+```{text, eval = F}
+data {
+  int<lower=0> N;          // Number of observations
+  vector[N] x;             // Predictor variable
+  vector[N] y;             // Response variable
+}
+
+parameters {
+  real beta_0;             // Intercept
+  real beta_1;             // Coefficient for linear term
+  real<lower=0> sigma;     // Standard deviation of residuals
+}
+
+model {
+  vector[N] mu;
+
+  // Priors (weakly informative)
+  beta_0 ~ normal(8, 4);
+  beta_1 ~ normal(0, 10);
+  sigma ~ normal(0, 5);
+
+  // Likelihood
+  y ~ normal(beta_0 + beta_1 * x, sigma);
+}
+```
+
+### Analysis 
+
+```{r, eval = F}
+zombie_data <- list(
+  N = n_zombies,
+  y = speed,
+  x = hours_since
+)
+zombie_single <- stan(
+  './stan/ex03_single-zombie-linear.stan',
+  'zombie-fit',
+  data = zombie_data,
+  iter = 5000, warmup = 1000, cores = 14
+)
+
+zombie_single
+
+```
+
+```{r, echo = F}
+
+zombie_single = readRDS('../data/ex03_single-zombie-linear.rds')
+zombie_single
+```
+
+Again, we can look at the output above to see some quick information about the overall model fit. Let's plot the results:
+
+
+First, we can look at how our posterior beliefs changed from the prior:
+```{r}
+# \- Visualizng the results -------------
+zombie_single_post <- zombie_single |> 
+  rstan::extract(pars = c('beta_0', 'beta_1', 'sigma'))
+
+b0_plot = posterior_param_plot(
+  zombie_single_post$beta_0,
+  dnorm, seq(1,20, length.out = 1000), beta_0,
+  mean = 8, sd = 4
+) + labs(subtitle = 'beta_0')
+b1_plot = posterior_param_plot(
+  zombie_single_post$beta_1,
+  dnorm, seq(-1, 1, length.out = 1000), beta_1,
+  mean = 0, sd = 3
+)+ labs(subtitle = 'beta_1')
+sigma_plot = posterior_param_plot(
+  zombie_single_post$sigma,
+  dnorm, seq(-3,3,length.out = 1000), sigma,
+  mean = 0, sd = 5
+)+ labs(subtitle = 'sigma')
+ggarrange(b0_plot, b1_plot, sigma_plot)
+```
+
+Now let's see how the posterior regression line works:
+
+```{r}
+
+pred_range = make_prediction_data(data.frame(hours_since))
+pred_zombie_speed = matrix(NA, length(zombie_single_post$beta_0), ncol = length(pred_range$hours_since))
+for(i in 1:length(pred_range$hours_since)) {
+  pred_zombie_speed[, i] <- zombie_single_post$beta_0 +
+    zombie_single_post$beta_1 * pred_range$hours_since[i]
+}
+pred_rel <- data.frame(
+  mean = apply(pred_zombie_speed, 2, mean),
+  low = apply(pred_zombie_speed, 2, function(x) HDInterval::hdi(x)[1]),
+  high = apply(pred_zombie_speed, 2, function(x) HDInterval::hdi(x)[2])
+)
+
+ggplot() +
+  geom_point(aes(x = hours_since, y = speed)) + 
+  geom_line(
+    data = data.frame(
+      hours = rep(pred_range$hours_since,100),
+      y = pred_zombie_speed[sample(1:nrow(pred_zombie_speed),100),] |> 
+        t() |> 
+        as.vector(),
+      line = as.character(rep(1:100, each = length(pred_range$hours_since)))
+    ),
+    aes(x = hours, y = y, group = line),
+    color = 'grey', alpha = 0.25
+  )+
+  geom_line(aes(x = pred_range$hours_since, y = pred_rel$mean)) +
+  geom_ribbon(
+    aes(
+      x = pred_range$hours_since,
+      ymin = pred_rel$low,
+      ymax = pred_rel$high
+    ),
+    fill = '#5BD08D',
+    alpha = 0.5
+  )+
+
+  labs(x= 'Hours since eating', y = 'Speed [mph]')+
+  theme_minimal()
+
+```
+
+To visualize how our approach is really working, I plotted both the mean and HDI posterior estimates for the regression fit. However, I also randomly sampled 100 (of the 16000 (4 chains x (5000-1000 iterations))) posterior estimates for this relationship. We can see how they vary around the mean, but each has its own estimate! These are shown by the gery lines wile the mean and hdi are black and green respectively.
+
+Again if we did this in a frequentist case, it's really not that different:
+
+```{r}
+lm(speed ~ hours_since) |> summary()
+```
+
+:::
+
+
+# Hierarchical Case
+
+Ok well that was stil a pretty straightforward case but it isn't that realistic. There are different types of zombies, everyone knows this. Zombies can be in parody (funny) movies, scary movies, or video games. And how fast they are will vary across all these different levels. We can use a nested model to describe these different types of zombies.
+
+:::{.panel-tabset}
+
+### Data Simulation
+
+For this simulation, I'm keepign the same predictors as before with the same slope, I've just now added a type_effect corresponding to which zombie it is.
+
+```{r}
+type_effect = c(0,2,10)
+sigma = 1
+
+n_zombies = 100
+hours_since = rnorm(n_zombies, mean = 10, sd= 2) # simulate number of hours
+type = sample(c('funny', 'scary', 'video_game'),n_zombies, replace = T) |> as.factor()
+speed = beta_1 * hours_since + type_effect[type] + rnorm(n_zombies, 0, sigma)
+
+
+# simulated data
+ggplot() +
+  geom_point(aes(x = hours_since, y = speed, color = type)) +
+  stat_smooth(aes(x = hours_since, y = speed, color = type), method = 'lm') +
+  labs(x= 'Hours since eating', y = 'Speed [mph]')+
+  theme_minimal()
+
+```
+
+### Model
+
+Now our model is nested to reflect that there will be different intecepts for each type of zombie. If we are trying to predict the speed of a single zombie, we can describe that as $y_{it}$ for the $i^{th}$ zombie of type $t$
+
+Honestly, the way I constructed this model, I didn't constrain the effect to 0, with some standard intercept as mean, instead I have the group intercepts drawn from a common mean intercept ($\phi$) which is nested above - all to say I may have written this slightly wrong with respect to indexing.
+
+The slope of the effect of speed is $\beta_h$ and the intercept for each group is $\beta_t$
+$$
+
+\begin{align}
+
+y_{it} &\sim \mathcal{N}(\mu_t, \sigma)\\
+\\
+\mu_t &= \beta_h * h_i + \Sigma_t \beta_t * t_i \\ 
+\beta_t &\sim \mathcal{N}(\phi, \tau)\\
+\\
+\sigma &\sim \mathcal{N}(0,5)\\
+\beta_h &\sim \mathcal{N}(0,10)\\
+\phi &\sim \mathcal{N}(0,10)\\
+\tau &\sim \mathcal{N}(0,5)\\
+
+\end{align}
+
+$$
+
+
+### Stan
+
+```{txt, eval = F}
+data {
+  int<lower=0> N;
+  int<lower=0> n_groups;
+  vector[N] x;
+  vector[N] y;
+  array[N] int<lower=1,upper=n_groups> type;
+}
+
+parameters {
+  real beta_1;
+  real group_mean;
+  vector[3] group_intercept;
+  real<lower=0> sigma;
+  real<lower=0> tau;         // Standard deviation of group effects
+}
+
+model {
+  vector[N] mu;
+
+  // Prior distributions
+  beta_1 ~ normal(0, 10);
+  group_mean ~ normal(0,10);
+  sigma ~ normal(0, 5);
+  tau ~ normal(0, 5);
+
+  for(i in 1:n_groups) {
+    group_intercept ~ normal(group_mean, tau);
+  }
+
+  for (i in 1:N) {
+    mu[i] = group_intercept[type[i]] + beta_1 * x[i];
+  }
+  y ~ normal(mu, sigma);
+}
+```
+
+### Analysis
+
+```{r, eval = F}
+# \- Run the stan -----------------------
+
+hier_zdata = list(
+  N = n_zombies,
+  n_groups = length(type_effect),
+  x = hours_since,
+  y = speed,
+  type = as.numeric(type)
+)
+
+hz_fit <- stan(
+  './stan/ex03_hierarchical-zombie.stan',
+  'hz',
+  data = hier_zdata,
+  iter = 5000, warmup = 1000, cores = 14
+)
+hz_fit
+```
+
+```{r, echo = F}
+hz_fit = readRDS('../data/ex03_hz.rds')
+hz_fit
+```
+
+Looks pretty good but we can go ahead and visualize this for more clarity:
+
+```{r}
+# \- plot this output --------------
+hz_post = extract(hz_fit, pars = c('beta_1', 'group_intercept'))
+hz_pred_speed = list(
+  matrix(NA, length(hz_post$beta_1), ncol = length(pred_range$hours_since)),
+  matrix(NA, length(hz_post$beta_1), ncol = length(pred_range$hours_since)),
+  matrix(NA, length(hz_post$beta_1), ncol = length(pred_range$hours_since))
+)
+
+for(i in 1:length(hz_pred_speed)) {
+  for(j in 1:length(pred_range$hours_since)) {
+    hz_pred_speed[[i]][, j] <- hz_post$group_intercept[,i] +
+      hz_post$beta_1 * pred_range$hours_since[j]
+  }
+}
+
+pred_hz <- hz_pred_speed |> 
+  lapply(
+    function(x) 
+    data.frame(
+      mean = apply(x, 2, mean),
+      low = apply(x, 2, function(k) HDInterval::hdi(k)[1]),
+      high = apply(x, 2, function(k) HDInterval::hdi(k)[2])
+    )
+  ) 
+for(i in 1:3) {
+  pred_hz[[i]]$type = c('funny', 'scary', 'video_game')[i]
+}
+
+pred_hz <- pred_hz |> 
+  do.call(what = rbind,)
+
+ggplot() +
+  geom_point(aes(x = hours_since, y = speed)) + 
+  geom_line(
+    aes(x = rep(pred_range$hours_since,3), y = pred_hz$mean, color = pred_hz$type)
+  ) +
+  geom_ribbon(
+    aes(
+      x = rep(pred_range$hours_since,3), 
+      ymin = pred_hz$low,
+      ymax = pred_hz$high, 
+      fill = pred_hz$type),
+    alpha = 0.5
+  )+
+  labs(x= 'Hours since eating', y = 'Speed [mph]')+
+  theme_minimal()
+
+```
+
+
+Fun. It is worth noting that this is essentially a mixed effects model which can be easily fit using a frequentist case with REML instead of OLS - in `lme4`. However, the bayesian case give us a little more control over our priors and we could easily do more like adding some individual level variation away from the group-level mean. I kept things simple here but it is easy to add layers!
+:::
